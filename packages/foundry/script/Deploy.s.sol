@@ -14,16 +14,23 @@ contract DeployScript is ScaffoldETHDeploy {
         "You don't have a deployer account. Make sure you have set DEPLOYER_PRIVATE_KEY in .env or use `yarn generate` to generate a new random account"
       );
     }
-    vm.startBroadcast(deployerPrivateKey);
+    // vm.startBroadcast(deployerPrivateKey);
 
-    YourContract yourContract = new YourContract(vm.addr(deployerPrivateKey));
-    console.logString(
-      string.concat(
-        "YourContract deployed at: ", vm.toString(address(yourContract))
-      )
+    // YourContract yourContract = new YourContract(vm.addr(deployerPrivateKey));
+    // console.logString(
+    //   string.concat(
+    //     "YourContract deployed at: ", vm.toString(address(yourContract))
+    //   )
+    // );
+
+    address deployer = vm.addr(deployerPrivateKey);
+    // Get the creation bytecode
+    bytes memory creationBytecode = abi.encodePacked(
+        type(YourContract).creationCode,
+        abi.encode(deployer)  // Constructor arguments
     );
-
-    vm.stopBroadcast();
+    deployContractWithSafeSign(creationBytecode);
+    // vm.stopBroadcast();
 
     /**
      * This function generates the file containing the contracts Abi definitions.
